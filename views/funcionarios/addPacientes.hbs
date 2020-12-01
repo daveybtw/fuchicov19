@@ -1,0 +1,145 @@
+<!DOCTYPE HTML5>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>App</title>
+    <link rel = "stylesheet" href = "/css/divs.css">
+    <link rel = "stylesheet" href = "/css/index.css">
+    <link rel = "stylesheet" href = "/css/form.css">
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.min.js"></script>
+  </head>
+  <body>
+    <!--- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: --->
+    <script>
+      $(document).ready(function() {
+        $(document).on('click', '#removeRow', function () {
+          $('#parientes').closest('#inputFormRow').remove();
+        });
+      });
+       
+      var openOrClose = 0;
+     
+
+      function openNav(){
+        if(openOrClose == 0){
+          document.getElementById("div-left-menu").style.width = "0%";
+          document.getElementById("div-left-menu").style.display = "none";
+          document.getElementById("div-right-content").style.width = "100%";
+          document.getElementById("div-right-content").style.marginLeft = "0%";
+          openOrClose = 1;
+        } else {
+          document.getElementById("div-left-menu").style.width = "20%";
+          document.getElementById("div-left-menu").style.display = "block";
+          document.getElementById("div-right-content").style.width = "80%";
+          document.getElementById("div-right-content").style.marginLeft = "20%";
+          openOrClose = 0;
+        }
+        
+      }
+
+      function addPariente(){
+        var para = document.createElement("P"); 
+        var inputNombre = document.createElement("input");
+        var inputParentesco = document.createElement("input");
+        inputNombre.type = "text"; 
+        inputNombre.name = "pariente[]";
+        inputNombre.id = "yes";
+        inputNombre.placeholder = "Ingrese el nombre completo del residente";
+        inputParentesco.type = "text"; 
+        inputParentesco.name = "parentesco[]";
+        inputParentesco.id = "inputFormRow";
+        inputParentesco.placeholder = "Ingrese el parentesco con el residente";
+        var parientesContainer = document.getElementById("parientes");
+        parientesContainer.appendChild(para);
+        parientesContainer.appendChild(inputNombre); // put it into the DOM
+        parientesContainer.appendChild(inputParentesco);
+        
+      }
+
+      function removePariente(){
+        var parientesContainer = document.getElementById("parientes");
+        parientesContainer.removeChild(parientesContainer.lastElementChild);
+        parientesContainer.removeChild(parientesContainer.lastElementChild);
+      }
+    </script>
+    <!--- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: --->
+    <div class = "div-left-menu" id = "div-left-menu">
+      <div class = "div-left-menu-header">
+        <div class = "div-left-menu-header-info">
+          <div class = "div-left-menu-header-top">
+            ¡Bienvenido nuevamente!
+          </div>
+          <div class = "div-left-menu-header-bottom">
+            {{ user.pnombre_persona }}
+            {{ user.snombre_persona }}
+            {{ user.papellido_persona }}
+          </div>
+        </div>
+      </div>
+      <div class = "div-left-menu-body">
+        <ul>
+          <li><a href = ""> <i class="fa fa-home"></i> Menu principal </a></li>
+          <li><a href = "/funcionario/paciente"> <i class="fa fa-user-plus"></i> Agregar paciente </a></li>
+          <li><a href = "/funcionario/doctor"> <i class="fa fa-user-md"></i> Agregar profesional </a></li>
+          <li><a href = "/funcionario/verpaciente"> <i class="fa fa-user-md"></i> Ver pacientes </a></li>
+        </ul>
+      </div>
+    </div>
+    <div class = "div-right-content" id = "div-right-content">
+      <button onclick = "openNav();" class = "btn" ><i class="fa fa-bars"></i></button>
+      <div class = "div-table">
+      <form action = "/funcionario/createpaciente" method = "POST" id = "formpaciente">
+      Ingrese los datos del paciente
+      <div class = "div-form-left">
+        <p> Nombre del paciente </p>
+        <input type = "text" placeholder = "Ingrese primer nombre" name = "pnombre_persona" required>
+        <input type = "text" placeholder = "Ingrese segundo nombre" name = "snombre_persona" required >
+        <p>Documento de identidad</p> 
+          <select class = "select-css" id = "cars" name = "tipo_id" form = "formpaciente">
+            <option value = "cc"> Cedula Ciudadania </option>
+            <option value = "ce"> Cedula Extranjeria </option>
+            <option value = "ti"> Tarjeta Identidad </option>
+            <option value = "rc"> Registro Civil </option>
+            <option value = "pa"> Pasaporte </option>
+          </select>
+          <input type = "number" placeholder = "Ingrese numero de documento" name = "id_persona" required>
+          
+          
+          <p>Ciudad de contagio</p>
+          <input type = "text" placeholder = "Ingrese ciudad de contagio" name = "ciudad_contagio" required>
+          <p>Personas con las que reside el paciente</p>
+          <button class = "button" type = "button" onclick = "addPariente();"> + </button>
+          <button class = "button red" type = "button" id = "removeRow"> - </button>
+      </div>
+
+      <div class = "div-form-right">
+        <p> Apellido del paciente </p>
+        <input type = "text" placeholder = "Ingrese primer nombre" name = "papellido_persona" required>
+        <input type = "text" placeholder = "Ingrese segundo nombre" name = "sapellido_persona" required>
+        <p>Direccion de residencia</p>
+          <input type = "text" placeholder = "Ingrese direccion" name = "direccion_persona" required>
+          <input type = "text" placeholder = "Ingrese barrio" name = "barrio_persona" required>
+        <p>Edad del paciente</p>
+          <input type = "number" placeholder = "Ingrese edad del paciente" name = "edad_paciente" required>
+        <p>Telefonos en caso de emergencia</p>
+          <input type = "number" placeholder = "Ingrese telefono 1" name = "telefono_emergencias1" required>
+          <input type = "number" placeholder = "Ingrese telefono 2" name = "telefono_emergencias2" required>
+        <p> Documento del doctor a cargo </p>
+        <input type = "text" placeholder = "Ingrese documento del doctor a cargo" name = "id_doctor" required>
+        <p> Geolocalizacion del paciente </p>
+        <input type = "text" placeholder = "Ingrese geolocalizacion" name = "geo_paciente" required>
+      </div>
+      <div id = "parientes">
+      </div> 
+       <input type ="submit" value = "Registrar" class = "button">         
+      </form>
+      </div>
+    </div>
+  <script type = "text/javascript">
+  
+  </script>
+  </body>
+</html>

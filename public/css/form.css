@@ -1,0 +1,22 @@
+.div-form-right{
+    position: absolute;
+    top: 13%;
+    margin-left: 40%;
+}
+
+.div-form-left{
+    
+    position: relative;
+}
+
+#parientes input[type=text] {
+    margin-top: 5px;
+}
+
+#parientes input[type=text] {
+    margin-left: 5px;
+}
+
+.red{
+    background-color: red;
+}

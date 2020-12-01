@@ -1,0 +1,96 @@
+<!DOCTYPE HTML5>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>App</title>
+    <link rel = "stylesheet" href = "/css/divs.css">
+    <link rel = "stylesheet" href = "/css/index.css">
+    <link rel = "stylesheet" href = "/css/form.css">
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body>
+    <!--- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: --->
+    <script>
+      var openOrClose = 0;
+
+      function openNav(){
+        if(openOrClose == 0){
+          document.getElementById("div-left-menu").style.width = "0%";
+          document.getElementById("div-left-menu").style.display = "none";
+          document.getElementById("div-right-content").style.width = "100%";
+          document.getElementById("div-right-content").style.marginLeft = "0%";
+          openOrClose = 1;
+        } else {
+          document.getElementById("div-left-menu").style.width = "20%";
+          document.getElementById("div-left-menu").style.display = "block";
+          document.getElementById("div-right-content").style.width = "80%";
+          document.getElementById("div-right-content").style.marginLeft = "20%";
+          openOrClose = 0;
+        }
+        
+      }
+    </script>
+    <!--- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: --->
+    <div class = "div-left-menu" id = "div-left-menu">
+      <div class = "div-left-menu-header">
+        <div class = "div-left-menu-header-info">
+          <div class = "div-left-menu-header-top">
+            ¡Bienvenido nuevamente!
+          </div>
+          <div class = "div-left-menu-header-bottom">
+            {{ user.pnombre_persona }}
+            {{ user.snombre_persona }}
+            {{ user.papellido_persona }}
+          </div>
+        </div>
+      </div>
+      <div class = "div-left-menu-body">
+        <ul>
+          <li><a href = ""> <i class="fa fa-home"></i> Menu principal </a></li>
+          <li><a href = "/funcionario/paciente"> <i class="fa fa-user-plus"></i> Agregar paciente </a></li>
+          <li><a href = "/funcionario/doctor"> <i class="fa fa-user-md"></i> Agregar profesional </a></li>
+          <li><a href = "/funcionario/verpaciente"> <i class="fa fa-user-md"></i> Ver pacientes </a></li>
+        </ul>
+      </div>
+    </div>
+    <div class = "div-right-content" id = "div-right-content">
+      <button onclick = "openNav();" class = "btn" ><i class="fa fa-bars"></i></button>
+      <div class = "div-table">
+      <form action = "/funcionario/createdoctor" method = "POST">
+      <div class = "div-form-left">
+        <p>Nombre</p>
+        <input type = "text" placeholder = "Ingrese primer nombre" name = "pnombre_persona" required>
+        <input type = "text" placeholder = "Ingrese segundo nombre" name = "snombre_persona" required >
+
+        <p>Ingrese el documento del profesional</p>
+        <input type = "number" placeholder = "Ingrese documento del profesional" name = "id_doctor" required>
+
+        <p>Entidad promotora de salud del profesional</p> 
+        <input type = "text" placeholder = "Ingrese entidad de salud" name = "entidadp_doctor" required>
+      </div>
+
+      <div class = "div-form-right">
+        <p>Apellido</p> 
+        <input type = "text" placeholder = "Ingrese primer apellido" name = "papellido_persona" required>
+        <input type = "text" placeholder = "Ingrese segundo apellido" name = "sapellido_persona" required> 
+
+        <p>Universidad donde egresa el profesional</p>
+        <input type = "text" placeholder = "Ingrese universidad" name = "universidad_doctor" required>
+
+        <p>Direccion de residencia del profesional</p>
+        <input type = "text" placeholder = "Ingrese direccion de residencia" name = "direccion_persona" required>
+
+        <p> Barrio de residencia </p>
+        <input type = "text" placeholder = "Ingrese direccion de residencia" name = "barrio_persona" required>
+
+      </div>
+      <br>
+          <input type ="submit" value = "Registrar" class = "button">
+      </form>
+      </div>
+    </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.min.js"></script>
+  </body>
+</html>

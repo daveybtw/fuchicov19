@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>App</title>
+    <link rel = "stylesheet" href = "/css/divs.css">
+    <link rel = "stylesheet" href = "/css/visita.css">
+    <link rel = "stylesheet" href = "/css/form.css">
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body>
+    <!--- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: --->
+    <script>
+      function hidePop(){
+        document.getElementById("pop").style.display = "none";
+      }
+
+      function openPop(telefono, direccion, parientes, fecha, edad){
+        document.getElementById("pop").style.display = "block";
+        document.getElementById("edad_paciente").innerHTML = direccion;
+        document.getElementById("direccion").innerHTML = direccion;
+        document.getElementById("telefono").innerHTML = telefono;
+        document.getElementById("parentesco").innerHTML = parientes;
+        document.getElementById("fecha").innerHTML = fecha;
+      }
+
+      function openForm(id){
+        document.getElementById("form").style.display = "block";
+        document.getElementById("documento_paciente").value = id;
+      }
+
+      function hideForm(){
+        document.getElementById("form").style.display = "none";
+      }
+
+      function findPaciente(){
+        findPac(document.getElementById("paciente_id").value);
+      }
+
+      var openOrClose = 0;
+
+      function openNav(){
+        if(openOrClose == 0){
+          document.getElementById("div-left-menu").style.width = "0%";
+          document.getElementById("div-left-menu").style.display = "none";
+          document.getElementById("div-right-content").style.width = "100%";
+          document.getElementById("div-right-content").style.marginLeft = "0%";
+          openOrClose = 1;
+        } else {
+          document.getElementById("div-left-menu").style.width = "20%";
+          document.getElementById("div-left-menu").style.display = "block";
+          document.getElementById("div-right-content").style.width = "80%";
+          document.getElementById("div-right-content").style.marginLeft = "20%";
+          openOrClose = 0;
+        }
+
+      function validateForm() {
+        var x = document.forms["searchForm"]["paciente_id"].value;
+        if (x == "") {
+          alert("Name must be filled out");
+          return false;
+        }
+      }
+        
+      }
+    </script>
+    <!--- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: --->
+    <div class = "div-left-menu" id = "div-left-menu">
+      <div class = "div-left-menu-header">
+        <div class = "div-left-menu-header-info">
+          <div class = "div-left-menu-header-top">
+            ¡Bienvenido nuevamente! <br> 
+            {{ datos.usuario.pnombre_persona }}
+            {{ datos.usuario.snombre_persona }}
+            {{ datos.usuario.papellido_persona }}
+          </div>
+          <div class = "div-left-menu-header-bottom">
+          </div>
+          
+        </div>
+      </div>
+      <div class = "div-left-menu-body">
+        <ul>
+          <li><a href = ""> <i class="fa fa-home"></i> Menu principal </a></li>
+          <li><a href = "/doctor/visitas"><i class="fa fa-book"></i> Visita medica </a></li>
+          <li><a href = "/doctor/pacientevisitas"><i class="fa fa-book"></i> Creacion de visitas </a></li>
+        </ul>
+      </div>
+    </div>
+    <div class = "div-right-content" id = "div-right-content">
+      <button onclick = "openNav();" class = "btn" ><i class="fa fa-bars"></i></button>
+      <div class = "div-table">
+        
+        <form name = "searchForm" method = "POST" action = "/doctor/paciente" onsubmit="return validateForm()" required>
+          <input type = "text" placeholder = "Buscar por identificacion del paciente" name = "paciente_id">
+          <input type = "submit" class = "button" value = "Buscar por paciente">
+          <input type = "submit" class = "button" value = "Buscar por doctor" formaction = "/doctor/visitas" formmethod="GET">
+        </form>
+        
+        <table>
+          <tr>
+            <th> ID del Paciente </th>
+            <th> Tipo de identificacion </th>
+            <th> Nombre paciente </th>
+            <th> Doctor a cargo </th>
+            <th> Mas detalles </th>
+          </tr>
+          {{#each datos.paciente }}
+          <tr style = "text-align: center;">
+            <td>{{ id_paciente }} </td>
+            <td>{{ tipo_id }} </td>
+            <td>{{ nombre_paciente }} </td>
+            <td>{{ nombre_doctor }} </td>
+            <td><i style = "color: DodgerBlue; cursor: pointer;" class = "fa fa-search-plus" onclick = "openPop('{{ telefonos_emergencias }}', '{{ direccion_residencia }}', '{{ n_parentesco }}', '{{ fecha_registro }}', '{{ edad_paciente }}')"></i>
+                <i style = "color: red; cursor: pointer;" class = "fa fa-book" onclick = "openForm('{{ id_paciente }}');"></i></td>
+          </tr>
+          {{/each}}
+        </table>
+      </div>
+
+      <div class = "div-overlay-background" id = "pop" style = "display: none;">  
+        <div class = "div-overlay-content">
+          <h1>Detalles del paciente</h1>
+          <p><b> Edad del paciente </b>
+          <span id = "edad_paciente"> edad </span></p>
+
+          <p><b> Direccion de residencia </b>
+          <span id = "direccion"> direccion </span></p>
+          
+          <p><b> Telefonos de emergencia </b>
+          <span id = "telefono"> telefono </span></p>
+          
+          <p><b>Nombre y parentesco </b>
+          <span id = "parentesco"> parentesco </span></p>
+
+          <p><b> Fecha de registro </b>
+          <span id = "fecha"> parentesco </span></p>
+
+
+          <button onclick = "hidePop();" class = "button"> Cerrar detalles </button>
+        </div>
+      </div>
+
+      <div class = "div-overlay-background" id = "form" style = "display: none;">  
+        <div class = "div-overlay-content" style = "margin-left: 10%; width: 80%">
+          <form action = "/doctor/createvisita" method = "POST" id = "formpaciente">
+            <h1> Datos de la nueva visita </h1>
+            <div class = "div-form-left">
+              <p>Documento de identidad del paciente</p> 
+              <input id = "documento_paciente" type = "number" name = "id_paciente">
+
+              <p> Temperatura del paciente </p>
+              <input type = "text" placeholder = "Ingrese temperatura" name = "temperatura_paciente" required>
+              <p> Receta medica </p>
+              <select class = "select-css" id = "id_medicamento" name = "id_medicamento" form = "formpaciente">
+                {{#each datos.medicamentos}}
+                <option value = "{{ id_medicamento }}"> {{ nombre_medicamento }} </option>
+                {{/each}}
+              </select>
+              <select class = "select-css" id = "id_laboratorio" name = "id_laboratorio" form = "formpaciente">
+                {{#each datos.laboratorios}}
+                <option value = "{{ id_laboratorio }}"> {{ nombre_laboratorio }} </option>
+                {{/each}}
+              </select>
+              <input type = "text" name = "dosis_recetada" placeholder = "ingrese la dosis" style = "width: 10%;">
+            </div>
+            
+            <div class = "div-form-right">
+              <p> Presion actual del paciente </p>
+              <input type = "text" placeholder = "Ingrese presion" name = "presion_paciente" required>
+              <p> Observaciones de la visita </p>
+                <textarea name = "observaciones_visita" style='min-height: 1em' rows='10'></textarea>
+            </div>
+            <br> 
+            <input type ="submit" value = "Registrar" class = "button">        
+            </form>
+            <br> 
+          <button onclick = "hideForm();" class = "button"> Cerrar formulario </button>
+        </div>
+      </div>
+    </div>
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.min.js"></script>
+  </body>
+</html>

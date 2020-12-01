@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>App</title>
+    <link rel = "stylesheet" href = "/css/divs.css">
+    <link rel = "stylesheet" href = "/css/visita.css">
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body>
+    <!--- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: --->
+    <script>
+
+      function initMap() {
+        // The location of Uluru
+        const uluru = { lat: -25.344, lng: 131.036 };
+        const casa = { lat: -26.344, lng: 140.036 };
+        // The map, centered at Uluru
+        const map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 4,
+          center: uluru,
+        });
+        // The marker, positioned at Uluru
+        const marker = new google.maps.Marker({
+          position: uluru,
+          map: map,
+        });
+        
+        const casamarker = new google.maps.Marker({
+          position: casa,
+          map: map,
+        });
+      }
+
+      function hidePop(){
+        document.getElementById("pop").style.display = "none";
+      }
+
+      function openPop(paciente, doctor, temperatura, presion, fecha, observacion, medicamento, dosis, laboratorio){
+        document.getElementById("pop").style.display = "block";
+        document.getElementById("nombre").innerHTML = paciente;
+        document.getElementById("doctor").innerHTML = doctor;
+        document.getElementById("temperatura").innerHTML = temperatura;
+        document.getElementById("presion").innerHTML = presion;
+        document.getElementById("fecha").innerHTML = fecha;
+        document.getElementById("observaciones").innerHTML = observacion;
+        document.getElementById("medicamento").innerHTML =  medicamento + " Laboratorio:" + laboratorio + " Dosis:" + dosis;
+      }
+
+      function findPaciente(){
+        findPac(document.getElementById("paciente_id").value);
+      }
+
+      var openOrClose = 0;
+
+      function openNav(){
+        if(openOrClose == 0){
+          document.getElementById("div-left-menu").style.width = "0%";
+          document.getElementById("div-left-menu").style.display = "none";
+          document.getElementById("div-right-content").style.width = "100%";
+          document.getElementById("div-right-content").style.marginLeft = "0%";
+          openOrClose = 1;
+        } else {
+          document.getElementById("div-left-menu").style.width = "20%";
+          document.getElementById("div-left-menu").style.display = "block";
+          document.getElementById("div-right-content").style.width = "80%";
+          document.getElementById("div-right-content").style.marginLeft = "20%";
+          openOrClose = 0;
+        }
+      }
+
+      function validateForm() {
+        var x = document.forms["searchForm"]["paciente_id"].value;
+        if (x == "") {
+          alert("Name must be filled out");
+          return false;
+        }
+      }
+        
+      
+    </script>
+    <!--- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: --->
+    <div class = "div-left-menu" id = "div-left-menu">
+      <div class = "div-left-menu-header">
+        <div class = "div-left-menu-header-info">
+          <div class = "div-left-menu-header-top">
+            ¡Bienvenido nuevamente!
+          </div>
+          <div class = "div-left-menu-header-bottom">
+            {{ message.usuario.pnombre_persona }}
+            {{ message.usuario.snombre_persona }}
+            {{ message.usuario.papellido_persona }}
+          </div>
+          
+        </div>
+      </div>
+      <div class = "div-left-menu-body">
+        <ul>
+          <li><a href = ""> <i class="fa fa-home"></i> Menu principal </a></li>
+          <li><a href = "/doctor/visitas"><i class="fa fa-book"></i> Visita medica </a></li>
+          <li><a href = "/doctor/pacientevisitas"><i class="fa fa-book"></i> Creacion de visitas </a></li>
+        </ul>
+      </div>
+    </div>
+    <div class = "div-right-content" id = "div-right-content">
+      <button onclick = "openNav();" class = "btn" ><i class="fa fa-bars"></i></button>
+      <div class = "div-table">
+        
+        <form name = "searchForm" method = "POST" action = "/doctor/paciente" onsubmit="return validateForm()" required>
+          <input type = "text" placeholder = "Buscar por identificacion del paciente" name = "paciente_id">
+          <input type = "submit" class = "button" value = "Buscar por paciente">
+          <input type = "submit" class = "button" value = "Buscar por doctor" formaction = "/doctor/visitas" formmethod="GET">
+        </form>
+        
+        <table>
+          <tr>
+            <th> Identificacion paciente </th>
+            <th> Identificacion doctor </th>
+            <th> Temperatura </th>
+            <th> Presion </th>
+            <th> Fecha de la visita </th>
+            <th> Detalles de la visita </th>
+          </tr>
+          {{#each message.visitas }}
+          <tr style = "text-align: center;">
+            <td contenteditable = "true">{{ id_paciente }} </td>
+            <td contenteditable = "true">{{ id_doctor }} </td>
+            <td contenteditable = "true">{{ temperatura_paciente }} </td>
+            <td contenteditable = "true">{{ presion_paciente }} </td>
+            <td contenteditable = "true">{{ fecha_visita }} </td>
+            <td><i style = "color: DodgerBlue; cursor: pointer;" class = "fa fa-search-plus" onclick = "openPop('{{ nombre_paciente }}', '{{ nombre_doctor }} ', ' {{ temperatura_paciente }} ', '{{ presion_paciente }}', '{{ fecha_visita }}' ,'{{ observacion }}', '{{ medicamento }}', '{{ dosis }}', '{{ laboratorio }}')"></i> </td>
+          </tr>
+          {{/each}}
+        </table>
+      </div>
+
+      <div class = "div-overlay-background" id = "pop" style = "display: none;">  
+        <div class = "div-overlay-content">
+          <h1>Detalles del paciente</h1>
+          <p><b>Nombre del paciente: </b>
+          <span id = "nombre">nombre </span></p>
+          
+          <p><b>Doctor a cargo:</b>
+          <span id = "doctor"> doctor </span></p>
+
+          <p><b>Temperatura del paciente:</b>
+          <span id = "temperatura"> temperatura </span></p>
+
+          <p><b>Presion del paciente:</b>
+          <span id = "presion"> presion </span></p>
+
+          <p><b>Fecha de la visita:</b>
+          <span id = "fecha"> fecha </span></p>
+
+          <p><b>Observaciones:</b>
+          <span id = "observaciones"> observaciones </span></p>
+
+          <p><b>Receta Medica:</b>
+          <span id = "medicamento"> Medicamento </span></p>
+
+          <button onclick = "hidePop();" class = "button"> Cerrar detalles </button>
+        </div>
+      </div>
+    </div>
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.min.js"></script>
+  </body>
+</html>
