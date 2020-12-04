@@ -83,7 +83,7 @@ import { ReservaController } from './reserva/reserva.controller';
     PacientesContagiadosModule, 
     RecetaMedicaModule, 
     MedicamentoModule, 
-     Repository,
+    Repository,
     ObservacionesVisitaModule,
     ParientesPacientesModule,
     LaboratoriosModule,
@@ -105,6 +105,7 @@ import { ReservaController } from './reserva/reserva.controller';
   
   providers: [AppService,
     DatosPersonalesService,
-    DoctoresService],
+    DoctoresService,
+  PacientesContagiadosService],
 })
 export class AppModule {}

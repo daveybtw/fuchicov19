@@ -7,7 +7,7 @@ import { ReservaEntity } from './reserva.entity';
 export class ReservaService {
     constructor(
         @InjectRepository(ReservaEntity)
-        private registrantesRepository: Repository<ReservaEntity>
+        private reservaRepository: Repository<ReservaEntity>
     ){}
 
     public async createNewReserva(parametros){
@@ -16,10 +16,18 @@ export class ReservaService {
         newReserva.id_medicamento = parametros.id_medicamento;
         newReserva.id_laboratorio = parametros.id_laboratorio;
         newReserva.cantidad_reserva = parametros.cantidad_reserva;
-        this.registrantesRepository.save(newReserva);
+        this.reservaRepository.save(newReserva);
     }
 
-    public async findReservas(id: number): Promise<any>{
-        return await this.registrantesRepository.find()
+    public async findReservas(lab, med): Promise<any>{
+        return await this.reservaRepository.find({
+            where: [
+                {id_laboratorio: lab, id_medicamento: med}
+            ]
+        });
+    }
+
+    public async restarReservas(medicamento, laboratorio, cantidad){
+        return await this.reservaRepository.decrement({id_laboratorio: laboratorio, id_medicamento: medicamento}, "cantidad_reserva", cantidad);
     }
 }

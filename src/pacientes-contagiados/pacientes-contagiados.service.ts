@@ -2,7 +2,6 @@ import { Inject, Injectable, Post } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PacientesContagiadosEntity } from './pacientes-contagiados.entity';
-import { pacientesDto } from './dto/pacientes-contagiados.dto';
 
 @Injectable()
 export class PacientesContagiadosService {
@@ -52,5 +51,23 @@ export class PacientesContagiadosService {
 
     public async removePaciente(id){
         await this.pacientesRepository.delete({id_persona: id});
+    }
+
+    public async countAge(){
+        const edadSum = await this.pacientesRepository.createQueryBuilder()
+        .select("COUNT(edad_paciente)")
+        .addSelect("edad_paciente", "edad")
+        .groupBy("edad_paciente")
+        .orderBy("edad", "ASC")
+        .getRawMany();
+
+        return edadSum;
+    }
+
+    public async subQueryNeeds(){
+        const pacientesQuery = await this.pacientesRepository.createQueryBuilder()
+                                .select("id_persona");
+
+        return pacientesQuery.getQuery();
     }
 }

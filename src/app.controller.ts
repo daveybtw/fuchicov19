@@ -67,7 +67,7 @@ export class AppController {
           arraySimple["presion_paciente"] = visitaServicio[i].presion_paciente;
           arraySimple["id_paciente"] = visitaServicio[i].id_paciente;
           arraySimple["id_doctor"] = visitaServicio[i].id_doctor;
-          arraySimple["fecha_visita"] = visitaServicio[i].fecha_visita;
+          arraySimple["fecha_visita"] = visitaServicio[i].dia_visita + "/" + visitaServicio[i].mes_visita + "/" + visitaServicio[i].year_visita;
           arraySimple["observacion"] = observacionEncontrada[0].observaciones_visita;
           arraySimple["nombre_paciente"] = datosPaciente[0].pnombre_persona + " " + datosPaciente[0].snombre_persona + " "  + datosPaciente[0].papellido_persona + " " + datosPaciente[0].sapellido_persona;
           arraySimple["nombre_doctor"] = datosDoctor[0].pnombre_persona + " " + datosDoctor[0].snombre_persona + " "  + datosDoctor[0].papellido_persona + " " + datosDoctor[0].sapellido_persona;
@@ -88,7 +88,7 @@ export class AppController {
     @Render('doctores/verVisitas')
     async getUser(@Request() req){
         var datosUser = await this.datosServicio.findDatosById(req.user.id_persona);
-        const visitaServicio = await this.visitaServicio.findVisitaDoctor(1005890893);
+        const visitaServicio = await this.visitaServicio.findVisitaDoctor(req.user.id_persona);
         console.log(visitaServicio);
         var arrayObservaciones = [];
         var arrayCompuesto = [];
@@ -106,7 +106,7 @@ export class AppController {
             arraySimple["presion_paciente"] = visitaServicio[i].presion_paciente;
             arraySimple["id_paciente"] = visitaServicio[i].id_paciente;
             arraySimple["id_doctor"] = visitaServicio[i].id_doctor;
-            arraySimple["fecha_visita"] = visitaServicio[i].fecha_visita;
+            arraySimple["fecha_visita"] = visitaServicio[i].dia_visita + "/" + visitaServicio[i].mes_visita + "/" + visitaServicio[i].year_visita;
             arraySimple["observacion"] = observacionEncontrada[0].observaciones_visita;
             arraySimple["nombre_paciente"] = datosPaciente[0].pnombre_persona + " " + datosPaciente[0].snombre_persona + " "  + datosPaciente[0].papellido_persona + " " + datosPaciente[0].sapellido_persona;
             arraySimple["nombre_doctor"] = datosDoctor[0].pnombre_persona + " " + datosDoctor[0].snombre_persona + " "  + datosDoctor[0].papellido_persona + " " + datosDoctor[0].sapellido_persona;
@@ -120,17 +120,7 @@ export class AppController {
         return { message: arrayCompuesto};
     }
 
-    @UseGuards(AuthenticatedGuard)
-    @Get('doctor/panel')
-    @Render('doctores/panel')
-    async getStatistics(@Request() req){
-        var datosUser = await this.datosServicio.findDatosById(req.user.id_persona);
-        var datosVisita = await this.visitaServicio.countAll();
-        console.log(datosVisita);
-        var array = [];
-        array["user"] = datosUser;
-        return { datos: datosUser};
-    }
+    
     // :::::::::::::::::::::::::::::::::
     //          AÑADIR DOCTOR
     // :::::::::::::::::::::::::::::::::
@@ -212,6 +202,7 @@ export class AppController {
         arraySimple["direccion_residencia"] = pacienteDatos[0].direccion_persona;
         arraySimple["n_parentesco"] = parientes[0].nombre_completo + " " + parientes[0].parentesco;
         arraySimple["fecha_registro"] = pacienteArray[i].fecha_registro_paciente;
+        arraySimple["edad_paciente"] = pacienteArray[i].edad_paciente;
         arrayPaciente.push(arraySimple);
       }
       arrayCompuesto["usuario"] = datosUser[0];
@@ -222,11 +213,12 @@ export class AppController {
     }
 
     // :::::::::::::::::::::::::::::::::
-    //          GOOGLE MAPS
+    //  Funcionario:   Google maps
     // :::::::::::::::::::::::::::::::::
-    @Get('map')
-    @Render('mapa')
-    async mapa(){
+    @UseGuards(AuthenticatedGuard)
+    @Get('funcionario/mapa')
+    @Render('funcionarios/mapa')
+    async funcMapa(){
       var pacienteArray = await this.pacienteServicio.findAllPacientes();
       var coordenadasLatitud = [];
       var coordenadasLongitud = [];
@@ -244,13 +236,51 @@ export class AppController {
     }
 
     // :::::::::::::::::::::::::::::::::
-    //      ESTADISTICAS E INFORMES
+    //  Doctor: Google maps
     // :::::::::::::::::::::::::::::::::
-    @Get('stats')
-    @Render('estadisticas')
-    async stats(){
-      
-      
+    @UseGuards(AuthenticatedGuard)
+    @Get('doctor/mapa')
+    @Render('doctores/mapa')
+    async docMapa(){
+      var pacienteArray = await this.pacienteServicio.findAllPacientes();
+      var coordenadasLatitud = [];
+      var coordenadasLongitud = [];
+      var coordenadasTotales = [];
+      for(var i = 0; i < pacienteArray.length; i++){
+        var latitud = pacienteArray[i].geo_paciente.split(",")[0];
+        var longitud = pacienteArray[i].geo_paciente.split(",")[1];
+        coordenadasLatitud.push(latitud);
+        coordenadasLongitud.push(longitud)
+      }
+      coordenadasTotales["latitud"] = coordenadasLatitud;
+      coordenadasTotales["longitud"] = coordenadasLongitud;
+      console.log();
+      return { coordenadas: coordenadasTotales }
+    }
+
+    // :::::::::::::::::::::::::::::::::
+    //     Funcionario:  Informes
+    // :::::::::::::::::::::::::::::::::
+    @UseGuards(AuthenticatedGuard)
+    @Get('funcionario/panel')
+    @Render('funcionarios/estadisticas')
+    async funcStats(){
+
+    }
+
+    // :::::::::::::::::::::::::::::::::
+    //     Doctor:  Informes
+    // :::::::::::::::::::::::::::::::::
+    @UseGuards(AuthenticatedGuard)
+    @Get('doctor/panel')
+    @Render('doctores/estadisticas')
+    async getStatistics(@Request() req){
+        var datosUser = await this.datosServicio.findDatosById(req.user.id_persona);
+        var datosVisita = await this.visitaServicio.countAll();
+        console.log(datosVisita);
+        var array = [];
+        array["user"] = datosUser;
+        return { datos: datosUser};
     }
 
     // ---------------------------------------------------------------------------------------
@@ -303,47 +333,150 @@ export class AppController {
     @UseGuards(AuthenticatedGuard)
     @Post('doctor/createvisita')
     @Redirect('pacientevisitas')
-    async createVisit(@Body() parameters){
-      console.log(parameters);
+    async createVisit(@Body() parameters, @Request() req){
       var parametros = parameters;
-      parametros.id_doctor = 1005890893;
+      parametros.id_doctor = req.user.id_persona;
       var visitaCreada = await this.visitaServicio.createNewVisita(parametros);
-      console.log(visitaCreada);
       parametros.id_visita = visitaCreada.id_visita;
       var observacionCreada = await this.obsServicio.createNewObs(parametros);
       var recetaCreada = await this.recetaServicio.createNewReceta(parametros);
-      console.log(observacionCreada);
-      console.log(recetaCreada);
+      await this.reservaServicio.restarReservas(parameters.id_medicamento, parameters.id_laboratorio, parameters.dosis_recetada);
     }
 
+    // ---------------------------------
+    //   SERVICE: REDIRECCION
+    // ---------------------------------
     @UseGuards(AuthenticatedGuard)
     @Get('redireccion')
     async redireccionar(@Request() req, @Res() res: Response){
       var doctorDatos = await this.doctorServicio.findDoctor(req.user.id_persona);
       var registranteDatos = await this.registranteServicio.findRegistrante(req.user.id_persona);
       if(doctorDatos.length != 0){
-        res.redirect('doctor/visitas');
+        res.redirect('doctor/panel');
       } else {
-        res.redirect('funcionario/verpaciente');
+        res.redirect('funcionario/panel');
       }
     }
 
+    // ------------------------------------
+    //    SERVICE: VERIFICAR RESERVAS
+    // -----------------------------------
+    @UseGuards(AuthenticatedGuard)
+    @Post('doctor/checkreservas')
+    async checkResservas(@Body() body){
+      var reservaEncontrada = await this.reservaServicio.findReservas(body.id_lab, body.id_med);
+      if(reservaEncontrada[0].cantidad_reserva < body.cantidad){
+        return { resultado: 0, cantidad: reservaEncontrada[0].cantidad_reserva};
+      } else {
+        //await this.reservaServicio.restarReservas(body.id_med, body.id_lab, body.cantidad);
+        return { resultado: 1, cantidad: reservaEncontrada[0].cantidad_reserva};
+      }
+    }
+
+    // ---------------------------------
+    //   SERVICE: OBTENER ESTADISTICAS
+    // ---------------------------------
+
+    @UseGuards(AuthenticatedGuard)
     @Post('stats/obtain')
     async obtenerStatistics(@Body() body){
-      var fechas = [];
-      var numbers = [];
-      var arrayDatos = [];
+      var fechasArray = [];
+      var fechasCount = [];
       var today = new Date();
       var dd = String(today.getDate()).padStart(2, '0');
+      var mm = String(today.getMonth() + 1).padStart(2, '0');
       var yyyy = today.getFullYear();
-      var days_total = new Date(body.month, body.year, 0).getDate()
+      var fecha_completa = dd + '/' + mm + '/' + yyyy;
+      var visitaEncontrada = await this.visitaServicio.findDiaVisita(dd, mm, yyyy);
+      fechasArray.push(fecha_completa);
+      fechasCount.push(visitaEncontrada.length);
+      return { fechasA: fechasArray, fechasC: fechasCount };
+    }
+    // -----------------------------
+    @UseGuards(AuthenticatedGuard)
+    @Post('stats/obtain/dayy')
+    async encontrarDiario2(@Body() body){
+      var fechasArray = [];
+      var fechasCount = [];
+      var visitaEncontrada = await this.visitaServicio.findDiaVisita(body.day, body.month, body.year);
+      var fecha_completa = body.day + '/' + body.month + '/' + body.year;
+      fechasArray.push(fecha_completa);
+      fechasCount.push(visitaEncontrada.length);
+      return { fechasA: fechasArray, fechasC: fechasCount };
+    }
+
+    // -----------------------------
+    @UseGuards(AuthenticatedGuard)
+    @Post('stats/obtain/day')
+    async encontrarDiario(@Body() body){
+      var fechasArray = [];
+      var fechasCount = [];
+      var today = new Date();
+      var days_total = new Date(body.month, body.year, 0).getDate();
+      console.log(days_total);
       for(var i = 1; i <= days_total; i++){
         var fecha_completa = i + '/' + body.month + '/' + body.year;
-        var visitaEncontrada = await this.visitaServicio.findVisitaFecha(fecha_completa);
-        fechas.push(fecha_completa);
-        numbers.push(visitaEncontrada.length);
+        var visitaEncontrada = await this.visitaServicio.findDiaVisita(i, body.month, body.year);
+        fechasArray.push(fecha_completa);
+        fechasCount.push(visitaEncontrada.length);
       }
-      return { fechas: fechas, numbers: numbers };
+      console.log(fechasArray);
+      return { fechasA: fechasArray, fechasC: fechasCount };
+    }
+
+    // -----------------------------
+    @UseGuards(AuthenticatedGuard)
+    @Post('stats/obtain/month')
+    async encontrarMensual(@Body() body){
+      var fechasArray = [];
+      var fechasCount = [];
+      var today = new Date();
+      var days_total = new Date(body.month, body.year, 0).getDate()
+      for(var i = 1; i <= 12; i++){
+        var fecha_completa = i + '/' + body.year;
+        var visitaEncontrada = await this.visitaServicio.findMesVisita(i, body.year);
+        fechasArray.push(fecha_completa);
+        fechasCount.push(visitaEncontrada.length);
+      }
+      return { fechasA: fechasArray, fechasC: fechasCount };
+    }
+
+    // -----------------------------
+    @UseGuards(AuthenticatedGuard)
+    @Post('stats/obtain/year')
+    async encontrarAnual(@Body() body){
+      var fechasArray = [];
+      var fechasCount = [];
+      for(var i = 1; i <= 3; i++){
+        var fecha_completa = 2018+i;
+        var visitaEncontrada = await this.visitaServicio.findAñoVisita(2018+i);
+        fechasArray.push("" + fecha_completa);
+        fechasCount.push(visitaEncontrada.length);
+      }
+      return { fechasA: fechasArray, fechasC: fechasCount };
+    }
+    // -----------------------------
+    @UseGuards(AuthenticatedGuard)
+    @Post('stats/obtain/rest')
+    async obtenerStatistics2(@Body() body){
+      var edad = await this.pacienteServicio.countAge();
+      var edadArray = [];
+      var edadCount = [];
+      for(var i = 0; i < edad.length; i++){
+        edadArray.push(edad[i].edad);
+        edadCount.push(edad[i].count);
+      }
+
+      var barrios = await this.datosServicio.countBarrios();
+      var barriosArray = [];
+      var barriosCount = [];
+      for(var i = 0; i < barrios.length; i++){
+        barriosArray.push(barrios[i].barrio);
+        barriosCount.push(edad[i].count);
+      }
+
+      console.log("SI");
+      return { edadA: edadArray, edadC: edadCount, barriosA: barriosArray, barriosC: barriosCount };
     }
 
     // ---------------------------------

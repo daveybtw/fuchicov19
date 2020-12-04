@@ -8,7 +8,4 @@ export class MedicamentoEntity{
 
     @Column('varchar', {length: 250})
     nombre_medicamento: string;
-
-    @Column({type: 'bigint'})
-    reserva_medicamento: number;
 }

@@ -1,6 +1,6 @@
 import { Inject, Injectable, Post } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, getRepository } from 'typeorm';
 import { VisitasMedicasEntity } from './visitas-medicas.entity';
 import { visitasDto } from './dto/visitas-medicas.dto';
 
@@ -20,9 +20,12 @@ export class VisitasMedicasService {
         newVisita.id_paciente = parametros.id_paciente;
         var today = new Date();
         var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-        var yyyy = today.getFullYear();
-        newVisita.fecha_visita = dd + '/' + mm + '/' + yyyy;
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); 
+        var yyyy = String(today.getFullYear());
+        newVisita.dia_visita = dd;
+        newVisita.mes_visita = mm;
+        newVisita.year_visita = yyyy;
+
         return this.visitasRepository.save(newVisita);
     }
 
@@ -42,10 +45,26 @@ export class VisitasMedicasService {
         })
     }
 
-    public async findVisitaFecha(fecha): Promise<any>{
+    public async findDiaVisita(dia, mes, año): Promise<any>{
         return await this.visitasRepository.find({
             where: [
-                {fecha_visita: fecha}
+                {dia_visita: dia, mes_visita: mes, year_visita: año}
+            ]
+        })
+    }
+
+    public async findMesVisita(mes, año): Promise<any>{
+        return await this.visitasRepository.find({
+            where: [
+                {mes_visita: mes, year_visita: año}
+            ]
+        })
+    }
+
+    public async findAñoVisita(año): Promise<any>{
+        return await this.visitasRepository.find({
+            where: [
+                {year_visita: año}
             ]
         })
     }

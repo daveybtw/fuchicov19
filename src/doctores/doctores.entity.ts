@@ -10,6 +10,9 @@ export class DoctoresEntity{
     id_registrante: number;
 
     @Column('varchar', {length: 250})
+    usuario_doctor: string;
+
+    @Column('varchar', {length: 250})
     password_doctor: string;
 
     @Column('varchar', {length: 250})

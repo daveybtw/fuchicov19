@@ -15,7 +15,6 @@ export class MedicamentoService {
         const newMedicamento = new MedicamentoEntity;
         newMedicamento.id_medicamento = parametros.id_medicamento;
         newMedicamento.nombre_medicamento = parametros.nombre_medicamento;
-        newMedicamento.reserva_medicamento = parametros.reserva_medicamento;
         return this.medicamentoRepository.save(newMedicamento);
     }
 

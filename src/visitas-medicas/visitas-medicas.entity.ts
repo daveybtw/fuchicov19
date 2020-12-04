@@ -19,5 +19,11 @@ export class VisitasMedicasEntity{
     id_doctor: number;
 
     @Column('varchar', {length: 250})
-    fecha_visita: string;
+    dia_visita: string;
+
+    @Column('varchar', {length: 250})
+    mes_visita: string;
+
+    @Column('varchar', {length: 250})
+    year_visita: string;
 }

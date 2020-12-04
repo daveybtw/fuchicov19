@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>App</title>
+    <link rel = "stylesheet" href = "/css/divs.css">
+    <link rel = "stylesheet" href = "/css/visita.css">
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body>
+    <!--- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: --->
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDX3678j6XfnXouTQBwy9EE7Can8dOaNFE&callback=initMap&libraries=&v=weekly"
+      defer
+    ></script>
+    
+    <script>
+
+      var openOrClose = 0;
+
+      function openNav(){
+        if(openOrClose == 0){
+          document.getElementById("div-left-menu").style.width = "0%";
+          document.getElementById("div-left-menu").style.display = "none";
+          document.getElementById("div-right-content").style.width = "100%";
+          document.getElementById("div-right-content").style.marginLeft = "0%";
+          openOrClose = 1;
+        } else {
+          document.getElementById("div-left-menu").style.width = "20%";
+          document.getElementById("div-left-menu").style.display = "block";
+          document.getElementById("div-right-content").style.width = "80%";
+          document.getElementById("div-right-content").style.marginLeft = "20%";
+          openOrClose = 0;
+        }
+      }    
+
+
+    function initMap() {
+        var coordsLatitud = "{{coordenadas.latitud}}";
+        var coordsLongitud = "{{coordenadas.longitud}}";
+        var arrayLatitud = coordsLatitud.split(",");
+        var arrayLongitud = coordsLongitud.split(",");
+        
+        const centro = { lat: 3.3778646598623467, lng: -76.53331244367045 };
+
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 4,
+            center: centro,
+        });
+
+        var marker = new google.maps.Marker({
+            position: centro,
+            map: map,
+          });
+
+        for(var i = 0; i < arrayLatitud.length; i++){
+          var coordenadaCompleta = { lat: parseFloat(arrayLatitud[i]), lng: Number(arrayLongitud[i]) };
+          var marker = new google.maps.Marker({
+            position: coordenadaCompleta,
+            map: map,
+          });
+          console.log(coordenadaCompleta);
+        }
+    }   
+      
+    </script>
+
+    
+    <!--- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: --->
+    <div class = "div-left-menu" id = "div-left-menu">
+      <div class = "div-left-menu-header">
+        <div class = "div-left-menu-header-info">
+          <div class = "div-left-menu-header-top">
+            ¡Bienvenido nuevamente!
+          </div>
+          <div class = "div-left-menu-header-bottom">
+          </div>
+          
+        </div>
+      </div>
+      <div class = "div-left-menu-body">
+        <ul>
+          <li><a href = "/doctor/panel"> <i class="fa fa-home"></i> Menu principal </a></li>
+          <li><a href = "/doctor/visitas"><i class="fa fa-book"></i> Visita medica </a></li>
+          <li><a href = "/doctor/pacientevisitas"><i class="fa fa-book"></i> Creacion de visitas </a></li>
+          <li><a href = "/doctor/mapa"><i class="fa fa-book"></i> Mapa de pacientes </a></li>
+        </ul>
+      </div>
+    </div>
+    <div class = "div-right-content" id = "div-right-content">
+      <button onclick = "openNav();" class = "btn" ><i class="fa fa-bars"></i></button>
+      <div class = "div-table">
+          <div id="map"></div>
+      </div>
+    </div>
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.min.js"></script>
+  </body>
+</html>

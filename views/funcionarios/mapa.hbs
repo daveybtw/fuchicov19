@@ -1,17 +1,22 @@
-<!DOCTYPE HTML5>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8" />
     <title>App</title>
     <link rel = "stylesheet" href = "/css/divs.css">
-    <link rel = "stylesheet" href = "/css/index.css">
-    <link rel = "stylesheet" href = "/css/form.css">
+    <link rel = "stylesheet" href = "/css/visita.css">
     <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   </head>
   <body>
     <!--- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: --->
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDX3678j6XfnXouTQBwy9EE7Can8dOaNFE&callback=initMap&libraries=&v=weekly"
+      defer
+    ></script>
+    
     <script>
+
       var openOrClose = 0;
 
       function openNav(){
@@ -28,9 +33,40 @@
           document.getElementById("div-right-content").style.marginLeft = "20%";
           openOrClose = 0;
         }
+      }    
+
+
+    function initMap() {
+        var coordsLatitud = "{{coordenadas.latitud}}";
+        var coordsLongitud = "{{coordenadas.longitud}}";
+        var arrayLatitud = coordsLatitud.split(",");
+        var arrayLongitud = coordsLongitud.split(",");
         
-      }
+        const centro = { lat: 3.3778646598623467, lng: -76.53331244367045 };
+
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 4,
+            center: centro,
+        });
+
+        var marker = new google.maps.Marker({
+            position: centro,
+            map: map,
+          });
+
+        for(var i = 0; i < arrayLatitud.length; i++){
+          var coordenadaCompleta = { lat: parseFloat(arrayLatitud[i]), lng: Number(arrayLongitud[i]) };
+          var marker = new google.maps.Marker({
+            position: coordenadaCompleta,
+            map: map,
+          });
+          console.log(coordenadaCompleta);
+        }
+    }   
+      
     </script>
+
+    
     <!--- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: --->
     <div class = "div-left-menu" id = "div-left-menu">
       <div class = "div-left-menu-header">
@@ -39,10 +75,8 @@
             ¡Bienvenido nuevamente!
           </div>
           <div class = "div-left-menu-header-bottom">
-            {{ user.pnombre_persona }}
-            {{ user.snombre_persona }}
-            {{ user.papellido_persona }}
           </div>
+          
         </div>
       </div>
       <div class = "div-left-menu-body">
@@ -58,45 +92,10 @@
     <div class = "div-right-content" id = "div-right-content">
       <button onclick = "openNav();" class = "btn" ><i class="fa fa-bars"></i></button>
       <div class = "div-table">
-      <form action = "/funcionario/createdoctor" method = "POST">
-      <div class = "div-form-left">
-        <p>Nombre</p>
-        <input type = "text" placeholder = "Ingrese primer nombre" name = "pnombre_persona" required>
-        <input type = "text" placeholder = "Ingrese segundo nombre" name = "snombre_persona" required >
-
-        <p>Ingrese el documento del profesional</p>
-        <input type = "number" placeholder = "Ingrese documento del profesional" name = "id_persona" required>
-
-        <p>Entidad promotora de salud del profesional</p> 
-        <input type = "text" placeholder = "Ingrese entidad de salud" name = "entidadp_doctor" required>
-
-        <p> Datos de inicio de sesion </p>
-        <input type = "text" placeholder = "Ingrese usuario del doctor" name = "usuario_doctor" required>
-        <input type = "text" placeholder = "Ingrese contraseña del doctor" name = "password_doctor" required>
-      </div>
-
-      <div class = "div-form-right">
-        <p>Apellido</p> 
-        <input type = "text" placeholder = "Ingrese primer apellido" name = "papellido_persona" required>
-        <input type = "text" placeholder = "Ingrese segundo apellido" name = "sapellido_persona" required> 
-
-        <p>Universidad donde egresa el profesional</p>
-        <input type = "text" placeholder = "Ingrese universidad" name = "universidad_doctor" required>
-
-        <p>Direccion de residencia del profesional</p>
-        <input type = "text" placeholder = "Ingrese direccion de residencia" name = "direccion_persona" required>
-
-        <p> Barrio de residencia </p>
-        <input type = "text" placeholder = "Ingrese direccion de residencia" name = "barrio_persona" required>
-
-        <p>Registrante</p>
-        <input type = "text" value = "{{ user.id_persona }}" name = "id_registrante" readonly>
-      </div>
-      <br>
-          <input type ="submit" value = "Registrar" class = "button">
-      </form>
+          <div id="map"></div>
       </div>
     </div>
+  
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.min.js"></script>
   </body>

@@ -16,9 +16,49 @@
         document.getElementById("pop").style.display = "none";
       }
 
+      function verificarReserva(id_lab, id_med, cnt){
+        $.ajax({
+              url: "/doctor/checkreservas",
+              type: "POST",
+              data: 'id_lab=' + id_lab + '&id_med=' + id_med + '&cantidad=' + cnt,
+              success: function(result){
+                if(result.resultado == 0){
+                  alert("No hay suficiente cantidad de este medicamento con este laboratorio");
+                  cambiarValor(result.cantidad);
+                  enableButton(1);
+                } else {
+                  cambiarValor(result.cantidad);
+                  enableButton(0);
+                }
+              }
+        });
+      }
+
+      function enableButton(number){
+        if(number == 1){
+          document.getElementById("btnSubmit").disabled = true;
+        } else {
+          document.getElementById("btnSubmit").disabled = false;
+        }
+      }
+
+      function verificarCantidad(){
+        var id_lab = document.getElementById("id_laboratorio").value;
+        var id_med = document.getElementById("id_medicamento").value;
+        var cantidad = document.getElementById("dosis_recetada").value;
+        if(cantidad == ""){
+          cantidad = 0;
+        }
+        verificarReserva(id_lab, id_med, cantidad);
+      }
+
+      function cambiarValor(valor){
+        document.getElementById("cantidad_del_medicamento").value = valor;
+      }
+
       function openPop(telefono, direccion, parientes, fecha, edad){
         document.getElementById("pop").style.display = "block";
-        document.getElementById("edad_paciente").innerHTML = direccion;
+        document.getElementById("edad_paciente").innerHTML = edad;
         document.getElementById("direccion").innerHTML = direccion;
         document.getElementById("telefono").innerHTML = telefono;
         document.getElementById("parentesco").innerHTML = parientes;
@@ -82,9 +122,10 @@
       </div>
       <div class = "div-left-menu-body">
         <ul>
-          <li><a href = ""> <i class="fa fa-home"></i> Menu principal </a></li>
+          <li><a href = "/doctor/panel"> <i class="fa fa-home"></i> Menu principal </a></li>
           <li><a href = "/doctor/visitas"><i class="fa fa-book"></i> Visita medica </a></li>
           <li><a href = "/doctor/pacientevisitas"><i class="fa fa-book"></i> Creacion de visitas </a></li>
+          <li><a href = "/doctor/mapa"><i class="fa fa-book"></i> Mapa de pacientes </a></li>
         </ul>
       </div>
     </div>
@@ -148,12 +189,12 @@
             <h1> Datos de la nueva visita </h1>
             <div class = "div-form-left">
               <p>Documento de identidad del paciente</p> 
-              <input id = "documento_paciente" type = "number" name = "id_paciente">
+              <input id = "documento_paciente" type = "number" name = "id_paciente" readonly>
 
               <p> Temperatura del paciente </p>
               <input type = "text" placeholder = "Ingrese temperatura" name = "temperatura_paciente" required>
               <p> Receta medica </p>
-              <select class = "select-css" id = "id_medicamento" name = "id_medicamento" form = "formpaciente">
+              <select class = "select-css" id = "id_medicamento" name = "id_medicamento" form = "formpaciente" onchange = "verificarCantidad();">
                 {{#each datos.medicamentos}}
                 <option value = "{{ id_medicamento }}"> {{ nombre_medicamento }} </option>
                 {{/each}}
@@ -163,7 +204,8 @@
                 <option value = "{{ id_laboratorio }}"> {{ nombre_laboratorio }} </option>
                 {{/each}}
               </select>
-              <input type = "text" name = "dosis_recetada" placeholder = "ingrese la dosis" style = "width: 10%;">
+              <input type = "number" id = "dosis_recetada" onchange = "verificarCantidad();" name = "dosis_recetada" placeholder = "ingrese la dosis" style = "width: 10%;" required>
+              <br> <input type = "text"  id = "cantidad_del_medicamento" readonly style = "width: 100px" >
             </div>
             
             <div class = "div-form-right">
@@ -173,7 +215,7 @@
                 <textarea name = "observaciones_visita" style='min-height: 1em' rows='10'></textarea>
             </div>
             <br> 
-            <input type ="submit" value = "Registrar" class = "button">        
+            <input id = "btnSubmit" type ="submit" value = "Registrar" class = "button">        
             </form>
             <br> 
           <button onclick = "hideForm();" class = "button"> Cerrar formulario </button>

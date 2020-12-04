@@ -15,6 +15,8 @@ export class DoctoresService {
         const newDoctor = new DoctoresEntity();
         newDoctor.id_persona = parametros.id_persona;
         newDoctor.id_registrante = parametros.id_registrante;
+        newDoctor.usuario_doctor = parametros.usuario_doctor;
+        newDoctor.password_doctor = parametros.password_doctor;
         newDoctor.universidad_doctor = parametros.universidad_doctor;
         newDoctor.entidadp_doctor = parametros.entidadp_doctor;
         var today = new Date();
@@ -40,7 +42,7 @@ export class DoctoresService {
 
     public async findUsernameAndPassword(username, pass): Promise<any>{
         return await this.doctoresRepository.find({
-            where: { id_persona: username, 
+            where: { usuario_doctor: username, 
                 password_doctor: pass}
         });
     }

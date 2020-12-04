@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>App</title>
+    <link rel = "stylesheet" href = "/css/divs.css">
+    <link rel = "stylesheet" href = "/css/visita.css">
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+
+      google.charts.setOnLoadCallback(visitasIniciales);
+
+      // -------------------------------------
+      function visitasIniciales(dia, mes, año) {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
+        $.ajax({
+              url: "/stats/obtain",
+              type: "POST",
+              data: 'month=' + mm + '&year=' + yyyy,
+              success: function(result){
+                console.log(result.fechasA);
+                drawFechas(result.fechasA, result.fechasC);
+                dataNoVariable();
+              }
+        });
+      }
+      // -------------------------------------
+      function dataNoVariable() {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
+        $.ajax({
+              url: "/stats/obtain/rest",
+              type: "POST",
+              data: 'month=' + 1 + '&year=' + 1,
+              success: function(result){
+                drawEdades(result.edadA, result.edadC);
+                drawBarrios(result.barriosA, result.barriosC)
+              }
+        });
+      }
+      // -------------------------------------
+      function busquedaDiaria(dia, mes, year) {
+        $.ajax({
+              url: "/stats/obtain/dayy",
+              type: "POST",
+              data: 'day=' + dia + '&month=' + mes + '&year=' + year,
+              success: function(result){
+                console.log(result.fechasA);
+                drawFechas(result.fechasA, result.fechasC);
+              }
+        });
+      }
+      // -------------------------------------
+      function busquedaMensual(mes, year) {
+        $.ajax({
+              url: "/stats/obtain/month",
+              type: "POST",
+              data: 'month=' + mes + '&year=' + year,
+              success: function(result){
+                console.log(result.fechasA);
+                drawFechas(result.fechasA, result.fechasC);
+              }
+        });
+      }
+      // -------------------------------------
+      function busquedaAnual() {
+        $.ajax({
+              url: "/stats/obtain/year",
+              type: "POST",
+              data: 'year=' + 1,
+              success: function(result){
+                console.log(result.fechasA);
+                drawFechas(result.fechasA, result.fechasC);
+              }
+        });
+      }
+      // ------------------------------------
+      function busquedaDiariaAux(){
+        var dia = document.getElementById("days").value;
+        var mes = document.getElementById("months").value;
+        var year = document.getElementById("year").value;
+        busquedaDiaria(dia, mes, year);
+      }
+      // ------------------------------------
+      function busquedaMensualAux(){
+        var dia = document.getElementById("days").value;
+        var mes = document.getElementById("months").value;
+        var year = document.getElementById("year").value;
+        busquedaMensual(mes, year);
+      }
+
+      // --------------------------------------
+      // ______________________________________
+
+      function drawFechas(fechas, counts){
+        // Create the data table.
+        var fechasArray = fechas;
+        var fechasCount = counts;
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Dia');
+        data.addColumn('number', 'Cantidad de visitas');
+        for(var i = 0; i < fechasArray.length; i++){
+          data.addRow([fechasArray[i], parseInt(fechasCount[i])] );
+        }
+        var options = {
+        'title':'Cantidad de visitas mensual',
+        'width':750,
+        'height':300};
+        
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.ColumnChart(document.getElementById('fecha_div'));
+        chart.draw(data, options);
+      }
+
+      function drawEdades(edades, counts){
+        // Create the data table.
+        var edadArray = edades.concat([]);
+        var edadCount = counts.concat([]);
+        var data = new google.visualization.DataTable();
+        data.addColumn('number', 'Edad');
+        data.addColumn('number', '# de pacientes');
+        for(var i = 0; i < edadArray.length; i++){
+          data.addRow([edadArray[i], parseInt(edadCount[i])] );
+        }
+        var options = {
+        'title': 'Paciente por edad',
+        'width': 750,
+        'height': 300};
+        
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.ColumnChart(document.getElementById('edad_div'));
+        chart.draw(data, options);
+      }
+
+      function drawBarrios(barrios, counts){
+        // Create the data table.
+        var barriosArray = barrios.concat([]);
+        var barriosCount = counts.concat([]);
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Barrio');
+        data.addColumn('number', '# de contagios');
+        for(var i = 0; i < barriosArray.length; i++){
+          data.addRow([barriosArray[i], parseInt(barriosCount[i])] );
+        }
+        var options = {
+        'title': 'Contagiados por barrio',
+        'width': 750,
+        'height': 300};
+        
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.ColumnChart(document.getElementById('barrios_div'));
+        chart.draw(data, options);
+      }
+    </script>
+  </head>
+  <body>
+    <!--- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: --->
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    <script>
+      var openOrClose = 0;
+
+      function openNav(){
+        if(openOrClose == 0){
+          document.getElementById("div-left-menu").style.width = "0%";
+          document.getElementById("div-left-menu").style.display = "none";
+          document.getElementById("div-right-content").style.width = "100%";
+          document.getElementById("div-right-content").style.marginLeft = "0%";
+          openOrClose = 1;
+        } else {
+          document.getElementById("div-left-menu").style.width = "20%";
+          document.getElementById("div-left-menu").style.display = "block";
+          document.getElementById("div-right-content").style.width = "80%";
+          document.getElementById("div-right-content").style.marginLeft = "20%";
+          openOrClose = 0;
+        }
+      }    
+    </script>
+    
+    
+
+    
+    <!--- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: --->
+    <div class = "div-left-menu" id = "div-left-menu">
+      <div class = "div-left-menu-header">
+        <div class = "div-left-menu-header-info">
+          <div class = "div-left-menu-header-top">
+            ¡Bienvenido nuevamente!
+          </div>
+          <div class = "div-left-menu-header-bottom">
+
+          </div>
+          
+        </div>
+      </div>
+      <div class = "div-left-menu-body">
+        <ul>
+          <li><a href = "/funcionario/panel"> <i class="fa fa-home"></i> Menu principal </a></li>
+          <li><a href = "/funcionario/paciente"> <i class="fa fa-user-plus"></i> Agregar paciente </a></li>
+          <li><a href = "/funcionario/doctor"> <i class="fa fa-user-md"></i> Agregar profesional </a></li>
+          <li><a href = "/funcionario/verpaciente"> <i class="fa fa-user-md"></i> Ver pacientes </a></li>
+          <li><a href = "/funcionario/mapa"> <i class="fa fa-user-md"></i> Mapa de pacientes </a></li>
+        </ul>
+      </div>
+    </div>
+    <div class = "div-right-content" id = "div-right-content">
+      <button onclick = "openNav();" class = "btn" ><i class="fa fa-bars"></i></button>
+      <div class = "div-table">
+          <p> Busqueda manual: </p>
+          <input type = "text" id = "days" placeholder = "Ingrese un dia del mes">
+
+          <select class = "select-css" id = "months">
+            <option value = "1"> Enero </option>
+            <option value = "2"> Febrero </option>
+            <option value = "3"> Marzo </option>
+            <option value = "4"> Abril </option>
+            <option value = "5"> Mayo </option>
+            <option value = "6"> Junio </option>
+            <option value = "7"> Julio </option>
+            <option value = "8"> Agosto </option>
+            <option value = "9"> Septiembre </option>
+            <option value = "10"> Octubre </option>
+            <option value = "11"> Noviembre </option>
+            <option value = "10"> Diciembre </option>
+          </select>
+
+          <select class = "select-css" id = "year">
+            <option value = "2019"> 2019 </option>
+            <option value = "2020"> 2020 </option>
+            <option value = "2021"> 2021 </option>
+          </select>
+
+          <button class = "button" onclick = "busquedaDiariaAux();"> Diario </button>
+          <button class = "button" onclick = "busquedaMensualAux();"> Mensual </button>
+          <button class = "button" onclick = "busquedaAnual();"> Anual </button>
+          <div id = "fecha_div"></div>
+          <div id = "edad_div"></div>
+          <div id = "barrios_div"></div>
+      </div>
+    </div>
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.min.js"></script>
+  </body>
+</html>
